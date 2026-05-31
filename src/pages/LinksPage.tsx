@@ -128,13 +128,47 @@ export default function LinksPage() {
     showToast(newActive ? 'Link activated.' : 'Link deactivated.');
   };
 
+  const validateUrl = (url: string): boolean => {
+    try {
+      const u = new URL(url);
+      return u.protocol === 'http:' || u.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.original_url.trim()) {
+      showToast('Please enter a destination URL', 'error');
+      return;
+    }
+
+    if (!validateUrl(formData.original_url)) {
+      showToast('Please enter a valid URL starting with http:// or https://', 'error');
+      return;
+    }
+
+    if (formData.custom_slug && (formData.custom_slug.length < 2 || formData.custom_slug.length > 50)) {
+      showToast('Custom slug must be between 2 and 50 characters', 'error');
+      return;
+    }
+
+    if (formData.custom_slug && !/^[a-z0-9-]+$/i.test(formData.custom_slug)) {
+      showToast('Custom slug can only contain letters, numbers, and hyphens', 'error');
+      return;
+    }
+
     setLoading(true);
 
     if (isSupabaseConfigured && supabase) {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setLoading(false); return; }
+      if (!user) {
+        showToast('Please sign in to create links', 'error');
+        setLoading(false);
+        return;
+      }
 
       const { data: wsData } = await supabase.from('workspaces').select('id, plan, links_used').eq('owner_id', user.id).limit(1).single();
 
@@ -148,30 +182,35 @@ export default function LinksPage() {
       const payload = {
         user_id: user.id,
         workspace_id: wsData ? wsData.id : null,
-        original_url: formData.original_url,
+        original_url: formData.original_url.trim(),
         short_code,
-        custom_slug: formData.custom_slug || null,
-        title: formData.title || null,
+        custom_slug: formData.custom_slug?.trim() || null,
+        title: formData.title?.trim() || null,
         password: formData.password || null,
         expires_at: formData.expires_at || null,
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
         folder_id: formData.folder_id || null,
+        is_active: true,
       };
 
       const { data, error } = await supabase.from('links').insert([payload]).select('*, link_clicks(count)').single();
       if (error) {
         console.error('Error creating link:', error.message);
-        showToast(error.message, 'error');
+        if (error.code === '23505') {
+          showToast('This custom slug is already taken', 'error');
+        } else {
+          showToast(error.message || 'Failed to create link', 'error');
+        }
       } else if (data) {
         setLinks([data as LinkWithClicks, ...links]);
         setIsOpen(false);
+        setFormData({ original_url: '', custom_slug: '', title: '', password: '', expires_at: '', tags: '', folder_id: '' });
         showToast('Link created successfully!');
       }
     } else {
-      showToast('Please configure Supabase to create real links.', 'error');
+      showToast('Supabase is not configured', 'error');
     }
     setLoading(false);
-    setFormData({ original_url: '', custom_slug: '', title: '', password: '', expires_at: '', tags: '', folder_id: '' });
   };
 
   const openEdit = (link: LinkWithClicks) => {
@@ -191,13 +230,34 @@ export default function LinksPage() {
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editLink) return;
+
+    if (!editFormData.original_url.trim()) {
+      showToast('Please enter a destination URL', 'error');
+      return;
+    }
+
+    if (!validateUrl(editFormData.original_url)) {
+      showToast('Please enter a valid URL starting with http:// or https://', 'error');
+      return;
+    }
+
+    if (editFormData.custom_slug && (editFormData.custom_slug.length < 2 || editFormData.custom_slug.length > 50)) {
+      showToast('Custom slug must be between 2 and 50 characters', 'error');
+      return;
+    }
+
+    if (editFormData.custom_slug && !/^[a-z0-9-]+$/i.test(editFormData.custom_slug)) {
+      showToast('Custom slug can only contain letters, numbers, and hyphens', 'error');
+      return;
+    }
+
     setEditLoading(true);
 
     if (isSupabaseConfigured && supabase) {
       const payload = {
-        original_url: editFormData.original_url,
-        custom_slug: editFormData.custom_slug || null,
-        title: editFormData.title || null,
+        original_url: editFormData.original_url.trim(),
+        custom_slug: editFormData.custom_slug?.trim() || null,
+        title: editFormData.title?.trim() || null,
         password: editFormData.password || null,
         expires_at: editFormData.expires_at || null,
         tags: editFormData.tags ? editFormData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
@@ -207,7 +267,11 @@ export default function LinksPage() {
       const { error } = await supabase.from('links').update(payload).eq('id', editLink.id);
       if (error) {
         console.error('Error updating link:', error.message);
-        showToast(error.message, 'error');
+        if (error.code === '23505') {
+          showToast('This custom slug is already taken', 'error');
+        } else {
+          showToast(error.message || 'Failed to update link', 'error');
+        }
       } else {
         setLinks(links.map(l => (l.id === editLink.id ? { ...l, ...payload } as LinkWithClicks : l)));
         setIsEditOpen(false);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { Loader2, X, Clock, Lock } from 'lucide-react';
+import { Loader as Loader2, X, Clock, Lock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 
@@ -13,7 +13,7 @@ interface LinkData {
   is_active: boolean;
 }
 
-const getBrowser = () => {
+const getBrowser = (): string => {
   const ua = navigator.userAgent;
   if (ua.includes('Chrome') && !ua.includes('Edg')) return 'Chrome';
   if (ua.includes('Firefox')) return 'Firefox';
@@ -22,7 +22,7 @@ const getBrowser = () => {
   return 'Other';
 };
 
-const getOS = () => {
+const getOS = (): string => {
   const ua = navigator.userAgent;
   if (ua.includes('Windows')) return 'Windows';
   if (ua.includes('Mac')) return 'macOS';
@@ -30,6 +30,13 @@ const getOS = () => {
   if (ua.includes('Android')) return 'Android';
   if (ua.includes('like Mac OS')) return 'iOS';
   return 'Other';
+};
+
+const getDevice = (): string => {
+  const ua = navigator.userAgent;
+  if (/iPad|Android/.test(ua)) return 'tablet';
+  if (/Mobi|Android|iPhone|iPod/.test(ua)) return 'mobile';
+  return 'desktop';
 };
 
 export default function Redirect() {
@@ -60,7 +67,7 @@ export default function Redirect() {
       
       await supabase.from('link_clicks').insert({
         link_id: data.id,
-        device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+        device: getDevice(),
         browser: getBrowser(),
         os: getOS(),
         referrer: document.referrer || 'Direct',
@@ -79,7 +86,7 @@ export default function Redirect() {
     if (supabase) {
       await supabase.from('link_clicks').insert({
         link_id: link.id,
-        device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+        device: getDevice(),
         browser: getBrowser(),
         os: getOS(),
         referrer: document.referrer || 'Direct',

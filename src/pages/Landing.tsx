@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Link2, BarChart3, ArrowRight, Settings2, Check, Menu, X, Play, Loader2, Copy, Sun, Moon, Monitor } from 'lucide-react';
+import { Link2, ChartBar as BarChart3, ArrowRight, Settings2, Check, Menu, X, Play, Loader as Loader2, Copy, Sun, Moon, Monitor } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../contexts/ThemeContext';
@@ -79,20 +79,38 @@ export default function Landing() {
     `transition-all duration-700 ${a.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 relative">
-      {/* Global Fixed Parallax 3D Grid */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center [perspective:1000px]">
-        <div 
-          className="absolute bottom-[-50%] w-[400%] h-[200%] opacity-30 dark:opacity-15"
+    <div className="min-h-screen bg-white dark:bg-slate-950 relative overflow-hidden">
+      {/* Animated Grid Background Layer */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center [perspective:1200px]">
+        {/* Primary Grid with perspective */}
+        <div
+          className="absolute inset-0 w-full h-full opacity-40 dark:opacity-20"
           style={{
             backgroundImage: `
-              linear-gradient(to right, #6366f1 1.5px, transparent 1.5px),
-              linear-gradient(to bottom, #6366f1 1.5px, transparent 1.5px)
+              linear-gradient(to right, #818cf8 0.8px, transparent 0.8px),
+              linear-gradient(to bottom, #818cf8 0.8px, transparent 0.8px)
             `,
-            backgroundSize: '80px 80px',
-            transform: `rotateX(65deg) translateY(${scrollY * 0.6}px) translateZ(-200px)`,
-            maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
+            backgroundSize: '60px 60px',
+            transform: `rotateX(70deg) perspective(800px) translateY(${scrollY * 0.5}px)`,
+            maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.8) 50%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.8) 50%, transparent 100%)',
+            transformOrigin: 'center bottom',
+          }}
+        />
+
+        {/* Secondary animated grid for depth */}
+        <div
+          className="absolute inset-0 w-full h-full opacity-20 dark:opacity-10"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #6366f1 1px, transparent 1px),
+              linear-gradient(to bottom, #6366f1 1px, transparent 1px)
+            `,
+            backgroundSize: '120px 120px',
+            transform: `rotateX(70deg) perspective(1000px) translateY(${scrollY * 0.3}px)`,
+            maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0.6) 50%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0.6) 50%, transparent 100%)',
+            transformOrigin: 'center bottom',
           }}
         />
       </div>
@@ -100,8 +118,8 @@ export default function Landing() {
       {/* ── NAVBAR ── */}
       <header className={`fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800 transition-shadow ${scrolled ? 'shadow-sm dark:shadow-zinc-900/50' : ''}`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-6xl relative z-10">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center"><span className="text-white dark:text-black font-bold text-lg leading-none tracking-tighter">s</span></div>
+          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center shadow-md"><span className="text-white font-bold text-lg leading-none tracking-tighter">S</span></div>
             <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-50">Sudi</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -148,14 +166,22 @@ export default function Landing() {
 
       <main className="pt-16 relative z-10">
         {/* ── HERO ── */}
-        <section ref={heroAnim.ref} className={`relative px-4 py-20 md:py-32 text-center mx-auto min-h-[90vh] flex flex-col justify-center ${anim(heroAnim)} overflow-hidden`}>
+        <section ref={heroAnim.ref} className={`relative px-4 py-20 md:py-32 text-center mx-auto min-h-[90vh] flex flex-col justify-center ${anim(heroAnim)} overflow-visible`}>
+          {/* Logo Background in Hero */}
+          <div className="absolute -top-40 -right-40 w-96 h-96 opacity-5 dark:opacity-3 pointer-events-none">
+            <img src={import.meta.env.BASE_URL ? new URL('../assets/image copy copy.png', import.meta.url).href : '/src/assets/image copy copy.png'} alt="" className="w-full h-full object-contain" />
+          </div>
+          <div className="absolute -bottom-20 -left-40 w-80 h-80 opacity-8 dark:opacity-4 pointer-events-none">
+            <img src={import.meta.env.BASE_URL ? new URL('../assets/image copy copy.png', import.meta.url).href : '/src/assets/image copy copy.png'} alt="" className="w-full h-full object-contain" />
+          </div>
+
           <div className="relative z-20 max-w-5xl mx-auto">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-8">✦ The modern link attribution platform</span>
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] text-zinc-900 dark:text-zinc-50">
             Turn clicks into<br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-gradient">revenue</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-emerald-500 to-cyan-500">revenue</span>
           </h1>
-          <p className="text-xl text-zinc-500 dark:text-zinc-400 mb-10 max-w-2xl mx-auto">The open-source link management infrastructure for modern marketing teams and creators.</p>
+          <p className="text-xl text-zinc-500 dark:text-zinc-400 mb-10 max-w-2xl mx-auto">The premium link management platform for modern marketing teams and creators.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
             <Link to="/register" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors inline-flex items-center gap-2">Start for free <ArrowRight className="w-5 h-5" /></Link>
             <button className="border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-6 py-4 rounded-full text-lg font-medium transition-colors inline-flex items-center gap-2"><Play className="w-5 h-5" /> View demo</button>
@@ -418,13 +444,13 @@ export default function Landing() {
           </div>
           <div className="border-t border-zinc-800 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-zinc-800 rounded flex items-center justify-center"><span className="text-zinc-400 font-bold text-xs">d</span></div>
-              <span className="text-zinc-500 text-sm">© 2026 Sudi. All rights reserved.</span>
+              <div className="w-6 h-6 bg-white rounded flex items-center justify-center"><span className="text-zinc-950 font-bold text-xs">S</span></div>
+              <span className="text-zinc-500 text-sm">© 2026 Sudi. Built with care for modern marketing teams.</span>
             </div>
             <div className="flex items-center gap-4">
-              <a href="https://x.com/Mustfa35429165" target="_blank" rel="noreferrer" className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">Twitter / X</a>
               <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">GitHub</a>
               <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">LinkedIn</a>
+              <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">Contact</a>
             </div>
           </div>
         </div>
