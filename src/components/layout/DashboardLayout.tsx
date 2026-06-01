@@ -29,7 +29,7 @@ export default function DashboardLayout() {
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
-      let subscription: { unsubscribe?: () => void } | null = null;
+      let subscription: any = null;
       try {
         if (isSupabaseConfigured && supabase) {
           const client = supabase;
@@ -81,7 +81,7 @@ export default function DashboardLayout() {
           setWorkspace(null);
         }
       } finally {
-        if (subscription && typeof subscription.unsubscribe === 'function') subscription.unsubscribe();
+        subscription?.unsubscribe?.();
         setIsLoading(false);
       }
     };
