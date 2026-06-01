@@ -28,8 +28,12 @@ export default function Register() {
     }
 
     const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { full_name: name } }
+      email,
+      password,
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`
+      }
     });
 
     if (error) {
@@ -49,7 +53,7 @@ export default function Register() {
     setOauthLoading(provider);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` }
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
     });
     if (error) { setError(error.message); setOauthLoading(null); }
   };

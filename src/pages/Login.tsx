@@ -42,7 +42,7 @@ export default function Login() {
     setOauthLoading(provider);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` }
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
     });
     if (error) { setError(error.message); setOauthLoading(null); }
   };
