@@ -26,7 +26,7 @@ export default function AuthCallback() {
 
       if (data?.session) {
         setStatus('Authentication successful. Redirecting to dashboard...');
-        setTimeout(() => window.location.replace('/dashboard'), 1200);
+        setTimeout(() => navigate('/dashboard'), 1200);
         return;
       }
 

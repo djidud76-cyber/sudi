@@ -51,12 +51,9 @@ function App() {
           <Route path="settings" element={<Settings />} />
         </Route>
 
-        {/* Redirect Handler */}
-        <Route path="/:shortCode" element={<Redirect />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
         {/* Redirect Handler - MUST come AFTER all named routes to avoid catching /reset-password, /auth/callback, etc. */}
-        <Route path="/:shortCode" element={<Redirect />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path=":shortCode" element={<Redirect />} />
+        <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
     </ThemeProvider>

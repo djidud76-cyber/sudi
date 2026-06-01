@@ -29,10 +29,35 @@ export default function DashboardLayout() {
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
+      let subscription: any = null;
       try {
         if (isSupabaseConfigured && supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) { navigate('/login'); return; }
+          // Prefer session check which is more reliable during history navigation
+          const { data: { session } } = await supabase.auth.getSession();
+
+          let user = session?.user ?? null;
+
+          // If no session immediately available, wait briefly for auth state change
+          if (!user) {
+            const waitForAuth = new Promise(resolve => {
+              const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+                if (sess?.user) {
+                  resolve(sess.user);
+                }
+              });
+              subscription = sub;
+              // Timeout: if no event within 1000ms, resolve null
+              setTimeout(() => resolve(null), 1000);
+            });
+            // eslint-disable-next-line @typescript-eslint/await-thenable
+            const maybeUser: any = await waitForAuth;
+            user = maybeUser ?? null;
+          }
+
+          if (!user) {
+            navigate('/login');
+            return;
+          }
 
           const { data: profileData, error: profileError } = await supabase
             .from('profiles').select('*').eq('id', user.id).single();
@@ -45,18 +70,17 @@ export default function DashboardLayout() {
 
           if (wsError) {
             console.error('Error fetching workspace:', wsError.message);
-            // No workspace — redirect to onboarding
             navigate('/onboarding');
             return;
           }
           if (wsData) setWorkspace(wsData);
           else { navigate('/onboarding'); return; }
         } else {
-          // No Supabase — null state, UI handles gracefully
           setProfile(null);
           setWorkspace(null);
         }
       } finally {
+        if (subscription && typeof subscription.unsubscribe === 'function') subscription.unsubscribe();
         setIsLoading(false);
       }
     };
