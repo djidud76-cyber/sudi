@@ -1,4 +1,4 @@
-import { Info, Zap, Shield, BarChart3, Twitter } from 'lucide-react';
+import { Info, Zap, Shield, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function About() {
@@ -16,7 +16,10 @@ export default function About() {
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">About Sudi</h1>
           <a href="https://x.com/Mustfa35429165" target="_blank" rel="noopener noreferrer" className="ml-4 inline-flex items-center gap-2 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white">
-            <Twitter className="w-6 h-6 text-indigo-600 dark:text-indigo-300" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-indigo-600 dark:text-indigo-300">
+              <path d="M3 3 L21 21" />
+              <path d="M21 3 L3 21" />
+            </svg>
             <span className="text-sm font-medium">Follow on X</span>
           </a>
         </div>

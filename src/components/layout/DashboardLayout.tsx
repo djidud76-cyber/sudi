@@ -29,23 +29,24 @@ export default function DashboardLayout() {
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
-      let subscription: any = null;
+      let subscription: { unsubscribe?: () => void } | null = null;
       try {
         if (isSupabaseConfigured && supabase) {
+          const client = supabase;
           // Prefer session check which is more reliable during history navigation
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { session } } = await client.auth.getSession();
 
           let user = session?.user ?? null;
 
           // If no session immediately available, wait briefly for auth state change
           if (!user) {
             const waitForAuth = new Promise(resolve => {
-              const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+              const { data: sub } = client.auth.onAuthStateChange((_, sess) => {
                 if (sess?.user) {
                   resolve(sess.user);
                 }
               });
-              subscription = sub;
+              subscription = sub as any;
               // Timeout: if no event within 1000ms, resolve null
               setTimeout(() => resolve(null), 1000);
             });
