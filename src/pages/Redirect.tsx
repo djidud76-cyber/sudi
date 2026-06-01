@@ -52,29 +52,42 @@ export default function Redirect() {
       if (!isSupabaseConfigured || !supabase) {
         window.location.href = 'https://dub.co'; return;
       }
-      const { data } = await supabase
-        .from('links')
-        .select('id, original_url, password, expires_at, is_active')
-        .or(`short_code.eq.${shortCode},custom_slug.eq.${shortCode}`)
-        .single();
+
+      try {
+        const { data, error } = await supabase
+          .from('links')
+          .select('id, original_url, password, expires_at, is_active')
+          .or(`short_code.eq.${shortCode},custom_slug.eq.${shortCode}`)
+          .single();
+
+        // Handle query errors (e.g., no rows found, multiple rows)
+        if (error) {
+          setState('notfound');
+          return;
+        }
+
+        if (!data || !data.is_active) { setState('notfound'); return; }
+        if (data.expires_at && new Date(data.expires_at) < new Date()) { setState('expired'); return; }
         
-      if (!data || !data.is_active) { setState('notfound'); return; }
-      if (data.expires_at && new Date(data.expires_at) < new Date()) { setState('expired'); return; }
-      
-      setLink(data as LinkData);
-      
-      if (data.password) { setState('password'); return; }
-      
-      await supabase.from('link_clicks').insert({
-        link_id: data.id,
-        device: getDevice(),
-        browser: getBrowser(),
-        os: getOS(),
-        referrer: document.referrer || 'Direct',
-      });
-      
-      setState('redirecting');
-      setTimeout(() => { window.location.href = data.original_url; }, 500);
+        setLink(data as LinkData);
+        
+        if (data.password) { setState('password'); return; }
+        
+        await supabase.from('link_clicks').insert({
+          link_id: data.id,
+          device: getDevice(),
+          browser: getBrowser(),
+          os: getOS(),
+          referrer: document.referrer || 'Direct',
+        });
+        
+        setState('redirecting');
+        setTimeout(() => { window.location.href = data.original_url; }, 500);
+      } catch (err) {
+        // Catch any unexpected errors and show not found
+        console.error('Error in link lookup:', err);
+        setState('notfound');
+      }
     };
     lookup();
   }, [shortCode]);
