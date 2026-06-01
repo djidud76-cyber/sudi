@@ -138,8 +138,9 @@ export default function ResetPassword() {
                   minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter a new password"
+                  placeholder="Min 8 characters"
                 />
+                <p className="text-xs text-zinc-500">Must be at least 8 characters long.</p>
               </div>
               <Button type="submit" disabled={submitting} className="w-full">
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Update password'}

@@ -184,6 +184,7 @@ export default function Register() {
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">Must be at least 8 characters long.</p>
             </div>
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create account'}
